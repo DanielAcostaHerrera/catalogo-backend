@@ -11,6 +11,8 @@ async function bootstrap() {
     prefix: '/portadas/',
   });
 
-  await app.listen(3000);
+  // Usar el puerto asignado por Render o 3000 en local
+  const port = process.env.PORT || 3000;
+  await app.listen(port);
 }
 bootstrap();
