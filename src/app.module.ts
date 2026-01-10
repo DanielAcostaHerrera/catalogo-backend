@@ -3,14 +3,15 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { GraphQLModule } from '@nestjs/graphql';
 import { ApolloDriver, ApolloDriverConfig } from '@nestjs/apollo';
 import { JuegosModule } from './juegos/juegos.module';
+import { join } from 'path';
 
 @Module({
   imports: [
     TypeOrmModule.forRoot({
       type: 'sqlite',
-      database: 'catalogo.db',   // tu base real
+      database: join(__dirname, '..', 'catalogo.db'), // ruta relativa y portable
       entities: [__dirname + '/**/*.entity{.ts,.js}'],
-      synchronize: false,        // MUY IMPORTANTE: NO tocar tu base real
+      synchronize: false, // MUY IMPORTANTE: no tocar tu base real
     }),
 
     GraphQLModule.forRoot<ApolloDriverConfig>({
@@ -18,8 +19,8 @@ import { JuegosModule } from './juegos/juegos.module';
       autoSchemaFile: true,
       playground: true,
     }),
-    JuegosModule, 
+    JuegosModule,
   ],
 })
-export class AppModule {}
+export class AppModule { }
 
