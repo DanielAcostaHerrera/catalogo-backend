@@ -18,7 +18,10 @@ import { join } from 'path';
       driver: ApolloDriver,
       autoSchemaFile: true,
       playground: true,
+      introspection: true,       // 🔑 habilita introspección en producción
+      persistedQueries: false,   // 🔑 desactiva persisted queries (evita la advertencia de Apollo)
     }),
+
     JuegosModule,
   ],
 })
