@@ -6,6 +6,13 @@ import { join } from 'path';
 async function bootstrap() {
   const app = await NestFactory.create<NestExpressApplication>(AppModule);
 
+  // Habilitar CORS para permitir peticiones desde tu frontend (Vite en localhost:5173 y Render)
+  app.enableCors({
+    origin: '*', // o pon aquí la URL de tu frontend si quieres restringir
+    methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
+    credentials: true,
+  });
+
   // Servir carpeta de portadas (funciona en local y en Render)
   app.useStaticAssets(join(__dirname, '..', 'portadas'), {
     prefix: '/portadas/',
