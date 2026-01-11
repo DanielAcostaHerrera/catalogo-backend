@@ -1,6 +1,7 @@
 import { Resolver, Query, Int, Args, ResolveField, Parent } from '@nestjs/graphql';
 import { JuegosService } from './juegos.service';
 import { Juego } from './juegos.entity';
+import { CatalogoResult } from './catalogo.result';
 
 @Resolver(() => Juego)
 export class JuegosResolver {
@@ -9,7 +10,7 @@ export class JuegosResolver {
     // ============================================================
     //  CATÁLOGO NORMAL (SIN FILTROS)
     // ============================================================
-    @Query(() => [Juego])
+    @Query(() => CatalogoResult)
     catalogo(
         @Args('page', { type: () => Int }) page: number,
         @Args('limit', { type: () => Int }) limit: number,
@@ -20,7 +21,7 @@ export class JuegosResolver {
     // ============================================================
     //  CATÁLOGO FILTRADO (BÚSQUEDA + FILTROS)
     // ============================================================
-    @Query(() => [Juego])
+    @Query(() => CatalogoResult)
     catalogoFiltrado(
         @Args('page', { type: () => Int }) page: number,
         @Args('limit', { type: () => Int }) limit: number,
@@ -66,18 +67,25 @@ export class JuegosResolver {
     // ============================================================
     @ResolveField(() => String)
     TamanoFormateado(@Parent() juego: Juego) {
+        const nombre = juego.Nombre?.toLowerCase() || "";
         const mb = Number(juego.Tamano);
 
-        if (!mb || isNaN(mb)) {
-            return null; // o "Desconocido" si prefieres
+        // Caso especial: juegos online o tamaño 0
+        if (mb === 0 || nombre.includes("[online]")) {
+            return "Variable";
         }
 
-        const gb = mb / 1024;
+        // Si no hay dato válido
+        if (!mb || isNaN(mb)) {
+            return "Desconocido";
+        }
 
-        if (gb < 1) {
+        // Conversión MB → GB
+        if (mb < 1024) {
             return `${mb} MB`;
         }
 
+        const gb = mb / 1024;
         return `${gb.toFixed(2)} GB`;
     }
 }

@@ -16,12 +16,17 @@ export class JuegosService {
     async obtenerCatalogo(page: number, limit: number) {
         const skip = (page - 1) * limit;
 
-        return this.repo.find({
+        const [juegos, total] = await this.repo.findAndCount({
             select: ['Id', 'Nombre', 'Portada', 'Tamano', 'AnnoAct'],
             skip,
             take: limit,
             order: { Nombre: 'ASC' },
         });
+
+        return {
+            juegos,
+            total, // 🔹 ahora el frontend sabe cuántos hay en total
+        };
     }
 
     // ============================================================
@@ -65,17 +70,12 @@ export class JuegosService {
             precioMax,
         } = filtros;
 
-        // -----------------------------------------
-        // 1. Construir filtros SQL
-        // -----------------------------------------
         const where: any = {};
 
-        // Filtro por nombre
         if (nombre) {
             where.Nombre = Like(`%${nombre}%`);
         }
 
-        // Filtro por tamaño (GB → MB)
         if (tamanoMin !== undefined || tamanoMax !== undefined) {
             const minMB = tamanoMin !== undefined ? tamanoMin * 1024 : undefined;
             const maxMB = tamanoMax !== undefined ? tamanoMax * 1024 : undefined;
@@ -89,7 +89,6 @@ export class JuegosService {
             }
         }
 
-        // Filtro por año
         if (annoMin !== undefined || annoMax !== undefined) {
             if (annoMin !== undefined && annoMax !== undefined) {
                 where.AnnoAct = Between(annoMin, annoMax);
@@ -100,34 +99,34 @@ export class JuegosService {
             }
         }
 
-        // -----------------------------------------
-        // 2. Traer TODOS los juegos que cumplen filtros SQL
-        // -----------------------------------------
+        // 1. Traer todos los juegos que cumplen filtros SQL
         let juegos = await this.repo.find({
             where,
             order: { Nombre: 'ASC' },
         });
 
-        // -----------------------------------------
-        // 3. Filtrar por precio (EN MEMORIA)
-        // -----------------------------------------
+        // 2. Filtrar por precio en memoria
         if (precioMin !== undefined || precioMax !== undefined) {
             juegos = juegos.filter(j => {
                 const precio = this.calcularPrecio(j);
-
                 if (precioMin !== undefined && precio < precioMin) return false;
                 if (precioMax !== undefined && precio > precioMax) return false;
-
                 return true;
             });
         }
 
-        // -----------------------------------------
-        // 4. PAGINAR DESPUÉS DE FILTRAR
-        // -----------------------------------------
+        // 3. Calcular total
+        const total = juegos.length;
+
+        // 4. Paginar después de filtrar
         const start = (page - 1) * limit;
         const end = start + limit;
+        const pagina = juegos.slice(start, end);
 
-        return juegos.slice(start, end);
+        // 5. Devolver juegos + total
+        return {
+            juegos: pagina,
+            total, // 🔹 ahora el frontend sabe cuántos hay en total
+        };
     }
 }
