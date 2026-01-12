@@ -27,4 +27,8 @@ export class Juego {
   @Field({ nullable: true })
   @Column({ name: 'Sinopsis', type: 'text', nullable: true })
   Sinopsis: string;
+
+  @Field({ nullable: true })
+  @Column({ name: 'Requisitos', type: 'text', nullable: true })
+  Requisitos: string;
 }

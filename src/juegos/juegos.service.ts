@@ -17,7 +17,7 @@ export class JuegosService {
         const skip = (page - 1) * limit;
 
         const [juegos, total] = await this.repo.findAndCount({
-            select: ['Id', 'Nombre', 'Portada', 'Tamano', 'AnnoAct'],
+            select: ['Id', 'Nombre', 'Portada', 'Tamano', 'AnnoAct', 'Requisitos'], // 🔹 añadimos Requisitos
             skip,
             take: limit,
             order: { Nombre: 'ASC' },
@@ -25,9 +25,10 @@ export class JuegosService {
 
         return {
             juegos,
-            total, // 🔹 ahora el frontend sabe cuántos hay en total
+            total,
         };
     }
+
 
     // ============================================================
     //  DETALLES DE UN JUEGO
