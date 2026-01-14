@@ -4,6 +4,8 @@ import { GraphQLModule } from '@nestjs/graphql';
 import { ApolloDriver, ApolloDriverConfig } from '@nestjs/apollo';
 import { JuegosModule } from './juegos/juegos.module';
 import { join } from 'path';
+import { AppController } from './app.controller';
+import { AppService } from './app.service';
 
 @Module({
   imports: [
@@ -21,9 +23,10 @@ import { join } from 'path';
       introspection: true,       // 🔑 habilita introspección en producción
       persistedQueries: false,   // 🔑 desactiva persisted queries (evita la advertencia de Apollo)
     }),
-
     JuegosModule,
   ],
+  controllers: [AppController],   // 👈 aquí registras el controlador
+  providers: [AppService],
 })
 export class AppModule { }
 
