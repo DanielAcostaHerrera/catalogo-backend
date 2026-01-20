@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository, Like, Between, MoreThanOrEqual, LessThanOrEqual } from 'typeorm';
+import { Repository, Like, Between, MoreThanOrEqual, LessThanOrEqual, Not } from 'typeorm';
 import { Juego } from './juegos.entity';
 
 @Injectable()
@@ -11,7 +11,7 @@ export class JuegosService {
     ) { }
 
     // ============================================================
-    //  CATÁLOGO NORMAL (SIN FILTROS)
+    //  CATÁLOGO NORMAL
     // ============================================================
     async obtenerCatalogo(page: number, limit: number) {
         const skip = (page - 1) * limit;
@@ -56,7 +56,27 @@ export class JuegosService {
     }
 
     // ============================================================
-    //  CATÁLOGO FILTRADO (CORREGIDO)
+    //  ULTIMOS ESTRENOS
+    // ============================================================
+
+    async obtenerUltimosEstrenos(limit: number) {
+        const annoActual = new Date().getFullYear();
+
+        const [juegos, total] = await this.repo.findAndCount({
+            select: ['Id', 'Nombre', 'Portada', 'AnnoAct'],
+            where: {
+                AnnoAct: annoActual,
+                Nombre: Not(Like('%[online]%')), // 🔹 excluye online
+            },
+            order: { Id: 'DESC' },
+            take: limit,
+        });
+
+        return { juegos, total };
+    }
+
+    // ============================================================
+    //  CATÁLOGO FILTRADO
     // ============================================================
     async filtrarCatalogo(filtros: any) {
         const {

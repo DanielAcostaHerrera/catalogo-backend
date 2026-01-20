@@ -63,6 +63,18 @@ export class JuegosResolver {
     }
 
     // ============================================================
+    //  ULTIMOS ESTRENOS
+    // ============================================================
+
+    @Query(() => CatalogoResult)
+    async ultimosEstrenos(
+        @Args('limit', { type: () => Int }) limit: number,
+    ): Promise<CatalogoResult> {
+        return this.service.obtenerUltimosEstrenos(limit);
+    }
+
+
+    // ============================================================
     //  TAMAÑO FORMATEADO (MB / GB)
     // ============================================================
     @ResolveField(() => String)
