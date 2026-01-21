@@ -21,6 +21,7 @@ import { AppService } from './app.service';
       driver: ApolloDriver,
       autoSchemaFile: true,
       introspection: true,
+      csrfPrevention: false,
     }),
 
     JuegosModule,
