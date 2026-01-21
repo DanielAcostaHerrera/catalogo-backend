@@ -63,7 +63,7 @@ export class JuegosService {
         const annoActual = new Date().getFullYear();
 
         const [juegos, total] = await this.repo.findAndCount({
-            select: ['Id', 'Nombre', 'Portada', 'AnnoAct'],
+            select: ['Id', 'Nombre', 'Portada', 'Tamano', 'AnnoAct', 'Requisitos'],
             where: {
                 AnnoAct: annoActual,
                 Nombre: Not(Like('%[online]%')), // 🔹 excluye online
