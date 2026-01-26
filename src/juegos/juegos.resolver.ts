@@ -1,9 +1,11 @@
-import { Resolver, Query, Int, Args, ResolveField, Parent } from '@nestjs/graphql';
+import { Resolver, Query, Int, Args, ResolveField, Parent, Mutation } from '@nestjs/graphql';
 import { JuegosService } from './juegos.service';
-import { Juego } from './juegos.entity';
+import { JuegoType } from './juego.type';
 import { CatalogoResult } from './catalogo.result';
+import { CrearJuegoInput } from './dto/create-juego.input';
+import { ActualizarJuegoInput } from './dto/update-juego.input';
 
-@Resolver(() => Juego)
+@Resolver(() => JuegoType)
 export class JuegosResolver {
     constructor(private readonly service: JuegosService) { }
 
@@ -49,23 +51,46 @@ export class JuegosResolver {
     // ============================================================
     //  DETALLES DE UN JUEGO
     // ============================================================
-    @Query(() => Juego, { nullable: true })
+    @Query(() => JuegoType, { nullable: true })
     juego(@Args('id', { type: () => Int }) id: number) {
         return this.service.obtenerJuegoPorId(id);
+    }
+
+    // ============================================================
+    //  CREAR JUEGO
+    // ============================================================
+    @Mutation(() => JuegoType)
+    crearJuego(@Args('data') data: CrearJuegoInput) {
+        return this.service.crearJuego(data);
+    }
+
+    // ============================================================
+    //  ACTUALIZAR JUEGO
+    // ============================================================
+    @Mutation(() => JuegoType, { nullable: true })
+    actualizarJuego(@Args('data') data: ActualizarJuegoInput) {
+        return this.service.actualizarJuego(data);
+    }
+
+    // ============================================================
+    //  ELIMINAR JUEGO
+    // ============================================================
+    @Mutation(() => Boolean)
+    eliminarJuego(@Args('id', { type: () => Int }) id: number) {
+        return this.service.eliminarJuego(id);
     }
 
     // ============================================================
     //  PRECIO (USANDO EL SERVICIO)
     // ============================================================
     @ResolveField(() => Int)
-    Precio(@Parent() juego: Juego) {
+    Precio(@Parent() juego: any) {
         return this.service.calcularPrecio(juego);
     }
 
     // ============================================================
     //  ULTIMOS ESTRENOS
     // ============================================================
-
     @Query(() => CatalogoResult)
     async ultimosEstrenos(
         @Args('limit', { type: () => Int }) limit: number,
@@ -73,26 +98,22 @@ export class JuegosResolver {
         return this.service.obtenerUltimosEstrenos(limit);
     }
 
-
     // ============================================================
     //  TAMAÑO FORMATEADO (MB / GB)
     // ============================================================
     @ResolveField(() => String)
-    TamanoFormateado(@Parent() juego: Juego) {
+    TamanoFormateado(@Parent() juego: any) {
         const nombre = juego.Nombre?.toLowerCase() || "";
         const mb = Number(juego.Tamano);
 
-        // Caso especial: juegos online o tamaño 0
         if (mb === 0 || nombre.includes("[online]")) {
             return "Variable";
         }
 
-        // Si no hay dato válido
         if (!mb || isNaN(mb)) {
             return "Desconocido";
         }
 
-        // Conversión MB → GB
         if (mb < 1024) {
             return `${mb} MB`;
         }

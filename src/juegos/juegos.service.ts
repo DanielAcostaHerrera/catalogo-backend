@@ -1,14 +1,67 @@
 import { Injectable } from '@nestjs/common';
-import { InjectRepository } from '@nestjs/typeorm';
-import { Repository, Like, Between, MoreThanOrEqual, LessThanOrEqual, Not } from 'typeorm';
-import { Juego } from './juegos.entity';
+import { InjectModel } from '@nestjs/mongoose';
+import { Model } from 'mongoose';
+import { Juego } from './juegos.schema';
+import { CatalogoResultType } from './types/catalogo-result.type';
+import { Counter } from './counter.schema';
+import { CrearJuegoInput } from './dto/create-juego.input';
+import { ActualizarJuegoInput } from './dto/update-juego.input';
 
 @Injectable()
 export class JuegosService {
     constructor(
-        @InjectRepository(Juego)
-        private readonly repo: Repository<Juego>,
+        @InjectModel(Juego.name)
+        private readonly juegoModel: Model<Juego>,
+
+        @InjectModel(Counter.name)
+        private readonly counterModel: Model<Counter>,
     ) { }
+
+    // ============================================================
+    //  GENERAR ID AUTOINCREMENTAL
+    // ============================================================
+    private async getNextId(): Promise<number> {
+        const counter = await this.counterModel.findOneAndUpdate(
+            { name: 'juegos' },
+            { $inc: { value: 1 } },
+            { new: true, upsert: true }
+        );
+
+        return counter.value;
+    }
+
+    // ============================================================
+    //  CREAR JUEGO
+    // ============================================================
+    async crearJuego(data: CrearJuegoInput): Promise<Juego> {
+        const nextId = await this.getNextId();
+
+        const nuevo = new this.juegoModel({
+            Id: nextId,
+            ...data,
+        });
+
+        return nuevo.save();
+    }
+
+    // ============================================================
+    //  EDITAR JUEGO
+    // ============================================================
+    async actualizarJuego(data: ActualizarJuegoInput): Promise<Juego | null> {
+        return this.juegoModel.findOneAndUpdate(
+            { Id: data.Id },
+            { $set: data },
+            { new: true }
+        );
+    }
+
+    // ============================================================
+    //  ELIMINAR JUEGO
+    // ============================================================
+    async eliminarJuego(Id: number): Promise<boolean> {
+        const result = await this.juegoModel.deleteOne({ Id });
+        return result.deletedCount === 1;
+    }
 
     // ============================================================
     //  CATÁLOGO NORMAL
@@ -16,25 +69,25 @@ export class JuegosService {
     async obtenerCatalogo(page: number, limit: number) {
         const skip = (page - 1) * limit;
 
-        const [juegos, total] = await this.repo.findAndCount({
-            select: ['Id', 'Nombre', 'Portada', 'Tamano', 'AnnoAct', 'Requisitos'], // 🔹 añadimos Requisitos
-            skip,
-            take: limit,
-            order: { Nombre: 'ASC' },
-        });
+        const [juegos, total] = await Promise.all([
+            this.juegoModel
+                .find({}, { _id: 0 })
+                .sort({ Nombre: 1 })
+                .skip(skip)
+                .limit(limit)
+                .exec(),
 
-        return {
-            juegos,
-            total,
-        };
+            this.juegoModel.countDocuments().exec(),
+        ]);
+
+        return { juegos, total };
     }
-
 
     // ============================================================
     //  DETALLES DE UN JUEGO
     // ============================================================
     async obtenerJuegoPorId(id: number) {
-        return this.repo.findOne({ where: { Id: id } });
+        return this.juegoModel.findOne({ Id: id }).exec();
     }
 
     // ============================================================
@@ -56,21 +109,24 @@ export class JuegosService {
     }
 
     // ============================================================
-    //  ULTIMOS ESTRENOS
+    //  ÚLTIMOS ESTRENOS
     // ============================================================
-
-    async obtenerUltimosEstrenos(limit: number) {
+    async obtenerUltimosEstrenos(limit: number): Promise<CatalogoResultType> {
         const annoActual = new Date().getFullYear();
 
-        const [juegos, total] = await this.repo.findAndCount({
-            select: ['Id', 'Nombre', 'Portada', 'Tamano', 'AnnoAct', 'Requisitos'],
-            where: {
-                AnnoAct: annoActual,
-                Nombre: Not(Like('%[online]%')), // 🔹 excluye online
-            },
-            order: { Id: 'DESC' },
-            take: limit,
-        });
+        const juegos = await this.juegoModel
+            .find(
+                {
+                    AnnoAct: annoActual,
+                    Nombre: { $not: /\[online\]/i },
+                },
+                { _id: 0 },
+            )
+            .sort({ Id: -1 })
+            .limit(limit)
+            .lean();
+
+        const total = juegos.length;
 
         return { juegos, total };
     }
@@ -91,42 +147,32 @@ export class JuegosService {
             precioMax,
         } = filtros;
 
-        const where: any = {};
+        const query: any = {};
 
         if (nombre) {
-            where.Nombre = Like(`%${nombre}%`);
+            query.Nombre = { $regex: nombre, $options: 'i' };
         }
 
         if (tamanoMin !== undefined || tamanoMax !== undefined) {
             const minMB = tamanoMin !== undefined ? tamanoMin * 1024 : undefined;
             const maxMB = tamanoMax !== undefined ? tamanoMax * 1024 : undefined;
 
-            if (minMB !== undefined && maxMB !== undefined) {
-                where.Tamano = Between(minMB, maxMB);
-            } else if (minMB !== undefined) {
-                where.Tamano = MoreThanOrEqual(minMB);
-            } else if (maxMB !== undefined) {
-                where.Tamano = LessThanOrEqual(maxMB);
-            }
+            query.Tamano = {};
+            if (minMB !== undefined) query.Tamano.$gte = minMB;
+            if (maxMB !== undefined) query.Tamano.$lte = maxMB;
         }
 
         if (annoMin !== undefined || annoMax !== undefined) {
-            if (annoMin !== undefined && annoMax !== undefined) {
-                where.AnnoAct = Between(annoMin, annoMax);
-            } else if (annoMin !== undefined) {
-                where.AnnoAct = MoreThanOrEqual(annoMin);
-            } else if (annoMax !== undefined) {
-                where.AnnoAct = LessThanOrEqual(annoMax);
-            }
+            query.AnnoAct = {};
+            if (annoMin !== undefined) query.AnnoAct.$gte = annoMin;
+            if (annoMax !== undefined) query.AnnoAct.$lte = annoMax;
         }
 
-        // 1. Traer todos los juegos que cumplen filtros SQL
-        let juegos = await this.repo.find({
-            where,
-            order: { Nombre: 'ASC' },
-        });
+        let juegos = await this.juegoModel
+            .find(query, { _id: 0 })
+            .sort({ Nombre: 1 })
+            .exec();
 
-        // 2. Filtrar por precio en memoria
         if (precioMin !== undefined || precioMax !== undefined) {
             juegos = juegos.filter(j => {
                 const precio = this.calcularPrecio(j);
@@ -136,18 +182,15 @@ export class JuegosService {
             });
         }
 
-        // 3. Calcular total
         const total = juegos.length;
 
-        // 4. Paginar después de filtrar
         const start = (page - 1) * limit;
         const end = start + limit;
         const pagina = juegos.slice(start, end);
 
-        // 5. Devolver juegos + total
         return {
             juegos: pagina,
-            total, // 🔹 ahora el frontend sabe cuántos hay en total
+            total,
         };
     }
 }

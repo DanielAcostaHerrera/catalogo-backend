@@ -1,22 +1,20 @@
 import { Module } from '@nestjs/common';
-import { TypeOrmModule } from '@nestjs/typeorm';
+import { MongooseModule } from '@nestjs/mongoose';
 import { GraphQLModule } from '@nestjs/graphql';
-import { ApolloDriver, ApolloDriverConfig } from '@nestjs/apollo';
+import { ApolloDriver } from '@nestjs/apollo';
 import { JuegosModule } from './juegos/juegos.module';
-import { join } from 'path';
+import { PortadasModule } from './portadas/portadas.module';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 
 @Module({
   imports: [
-    TypeOrmModule.forRoot({
-      type: 'sqlite',
-      database: join(__dirname, '..', 'catalogo.db'),
-      entities: [__dirname + '/**/*.entity{.ts,.js}'],
-      synchronize: false,
-    }),
+    // Conexión directa a MongoDB Atlas (hard‑code)
+    MongooseModule.forRoot(
+      'mongodb://danieldavidacostaherrera:Entrar020296@ac-des3zwn-shard-00-01.lg7n5tv.mongodb.net:27017/catalogo?tls=true&authSource=admin&directConnection=true'
+    ),
 
-    GraphQLModule.forRoot<ApolloDriverConfig>({
+    GraphQLModule.forRoot({
       driver: ApolloDriver,
       autoSchemaFile: true,
       introspection: true,
@@ -24,6 +22,7 @@ import { AppService } from './app.service';
     }),
 
     JuegosModule,
+    PortadasModule,
   ],
   controllers: [AppController],
   providers: [AppService],

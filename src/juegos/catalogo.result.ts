@@ -1,10 +1,10 @@
 import { ObjectType, Field, Int } from '@nestjs/graphql';
-import { Juego } from './juegos.entity';
+import { JuegoType } from './juego.type';
 
 @ObjectType()
 export class CatalogoResult {
-    @Field(() => [Juego])
-    juegos: Juego[];
+    @Field(() => [JuegoType])
+    juegos: JuegoType[];
 
     @Field(() => Int)
     total: number;
