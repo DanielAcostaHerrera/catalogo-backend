@@ -6,23 +6,23 @@ export class Juego extends Document {
     @Prop({ required: true, unique: true })
     Id: number;
 
-    @Prop()
+    @Prop({ required: true })
     Nombre: string;
 
-    @Prop()
+    @Prop({ required: true })
     Tamano: number;
 
-    @Prop()
-    AnnoAct: number;
+    @Prop({ type: Number, required: false })
+    AnnoAct?: number;
 
-    @Prop()
-    Portada: string;
+    @Prop({ type: String, required: false })
+    Portada?: string; // nombre del archivo en /portadas
 
-    @Prop()
-    Sinopsis: string;
+    @Prop({ type: String, required: false })
+    Sinopsis?: string;
 
-    @Prop()
-    Requisitos: string;
+    @Prop({ type: String, required: false })
+    Requisitos?: string;
 }
 
 export const JuegoSchema = SchemaFactory.createForClass(Juego);

@@ -8,8 +8,8 @@ export class CrearJuegoInput {
     @Field(() => Int)
     Tamano: number;
 
-    @Field(() => Int)
-    AnnoAct: number;
+    @Field(() => Int, { nullable: true })
+    AnnoAct?: number;
 
     @Field({ nullable: true })
     Portada?: string;

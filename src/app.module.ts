@@ -3,9 +3,10 @@ import { MongooseModule } from '@nestjs/mongoose';
 import { GraphQLModule } from '@nestjs/graphql';
 import { ApolloDriver } from '@nestjs/apollo';
 import { JuegosModule } from './juegos/juegos.module';
-import { PortadasModule } from './portadas/portadas.module';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
+import { ServeStaticModule } from '@nestjs/serve-static';
+import { join } from 'path';
 
 @Module({
   imports: [
@@ -21,8 +22,13 @@ import { AppService } from './app.service';
       csrfPrevention: false,
     }),
 
+    // Carpeta estática de portadas
+    ServeStaticModule.forRoot({
+      rootPath: join(__dirname, '..', 'portadas'),
+      serveRoot: '/portadas',
+    }),
+
     JuegosModule,
-    PortadasModule,
   ],
   controllers: [AppController],
   providers: [AppService],

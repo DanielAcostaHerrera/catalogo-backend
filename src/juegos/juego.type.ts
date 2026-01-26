@@ -12,16 +12,16 @@ export class JuegoType {
     Tamano: number;
 
     @Field(() => Int, { nullable: true })
-    AnnoAct: number;
+    AnnoAct?: number;
 
     @Field({ nullable: true })
-    Portada: string;
+    Portada?: string;
 
     @Field({ nullable: true })
-    Sinopsis: string;
+    Sinopsis?: string;
 
     @Field({ nullable: true })
-    Requisitos: string;
+    Requisitos?: string;
 
     @Field(() => Int)
     Precio: number;
