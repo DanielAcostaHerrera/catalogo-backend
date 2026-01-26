@@ -7,6 +7,10 @@ import { Counter } from './counter.schema';
 import { CrearJuegoInput } from './dto/create-juego.input';
 import { ActualizarJuegoInput } from './dto/update-juego.input';
 
+function escapeRegex(value: string): string {
+    return value.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+}
+
 @Injectable()
 export class JuegosService {
     constructor(
@@ -16,6 +20,10 @@ export class JuegosService {
         @InjectModel(Counter.name)
         private readonly counterModel: Model<Counter>,
     ) { }
+
+    private escapeRegex(value: string): string {
+        return value.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+    }
 
     // ============================================================
     //  GENERAR ID AUTOINCREMENTAL
@@ -134,6 +142,7 @@ export class JuegosService {
     // ============================================================
     //  CATÁLOGO FILTRADO
     // ============================================================
+
     async filtrarCatalogo(filtros: any) {
         const {
             page,
@@ -149,8 +158,10 @@ export class JuegosService {
 
         const query: any = {};
 
+        // 🔹 CORREGIDO: escapamos caracteres especiales antes de usar regex
         if (nombre) {
-            query.Nombre = { $regex: nombre, $options: 'i' };
+            const term = escapeRegex(nombre);
+            query.Nombre = { $regex: term, $options: 'i' };
         }
 
         if (tamanoMin !== undefined || tamanoMax !== undefined) {
