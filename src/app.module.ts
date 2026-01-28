@@ -12,7 +12,7 @@ import { join } from 'path';
   imports: [
     // Conexión directa a MongoDB Atlas (hard‑code)
     MongooseModule.forRoot(
-      'mongodb://danieldavidacostaherrera:Entrar020296@ac-des3zwn-shard-00-01.lg7n5tv.mongodb.net:27017/catalogo?tls=true&authSource=admin&directConnection=true'
+      'mongodb+srv://danieldavidacostaherrera:Entrar020296@ac-des3zwn.lg7n5tv.mongodb.net/catalogo?retryWrites=true&w=majority'
     ),
 
     GraphQLModule.forRoot({
