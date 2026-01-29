@@ -6,6 +6,8 @@ import { CatalogoResultType } from './types/catalogo-result.type';
 import { Counter } from './counter.schema';
 import { CrearJuegoInput } from './dto/create-juego.input';
 import { ActualizarJuegoInput } from './dto/update-juego.input';
+import preciosConfig from '../config/precios.json';
+
 
 function escapeRegex(value: string): string {
     return value.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
@@ -103,17 +105,20 @@ export class JuegosService {
     // ============================================================
     calcularPrecio(juego: Juego): number {
         const nombre = juego.Nombre.toLowerCase();
-        const mb = juego.Tamano;
-        const gb = mb / 1024;
+        const gb = juego.Tamano / 1024;
 
-        if (nombre.includes('[online]')) return 1000;
-        if (gb < 1) return 100;
-        if (gb < 10) return 200;
-        if (gb < 30) return 400;
-        if (gb < 60) return 600;
-        if (gb < 80) return 800;
+        // Caso especial: juegos online
+        if (nombre.includes('[online]')) return preciosConfig.juegos.online;
 
-        return 1000;
+        // Buscar el rango que cubra el tamaño
+        for (const rango of preciosConfig.juegos.rangos) {
+            if (gb >= rango.minGB && gb < rango.maxGB) {
+                return rango.precio;
+            }
+        }
+
+        // Si no entra en ningún rango, usar el default
+        return preciosConfig.juegos.default.precio;
     }
 
     // ============================================================
