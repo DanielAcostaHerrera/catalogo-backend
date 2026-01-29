@@ -1,8 +1,11 @@
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
 import { NestExpressApplication } from '@nestjs/platform-express';
+import * as dotenv from 'dotenv';
 
 async function bootstrap() {
+  dotenv.config();
+
   const app = await NestFactory.create<NestExpressApplication>(AppModule);
 
   // Habilitar CORS para permitir peticiones desde tu frontend (Vite en localhost:5173 y Render)

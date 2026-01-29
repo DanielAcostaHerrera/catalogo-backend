@@ -10,10 +10,7 @@ import { join } from 'path';
 
 @Module({
   imports: [
-    // Conexión directa a MongoDB Atlas (hard‑code)
-    MongooseModule.forRoot(
-      'mongodb+srv://danieldavidacostaherrera:Entrar020296@ac-des3zwn.lg7n5tv.mongodb.net/catalogo?retryWrites=true&w=majority'
-    ),
+    MongooseModule.forRoot(process.env.MONGO_URI as string),
 
     GraphQLModule.forRoot({
       driver: ApolloDriver,
@@ -22,7 +19,6 @@ import { join } from 'path';
       csrfPrevention: false,
     }),
 
-    // Carpeta estática de portadas
     ServeStaticModule.forRoot({
       rootPath: join(__dirname, '..', 'portadas'),
       serveRoot: '/portadas',
