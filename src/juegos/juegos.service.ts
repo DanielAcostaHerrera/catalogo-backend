@@ -31,14 +31,23 @@ export class JuegosService {
     //  GENERAR ID AUTOINCREMENTAL
     // ============================================================
     private async getNextId(): Promise<number> {
-        const counter = await this.counterModel.findOneAndUpdate(
+        let counter = await this.counterModel.findOneAndUpdate(
             { name: 'juegos' },
             { $inc: { value: 1 } },
-            { new: true, upsert: true }
+            { new: true }
         );
+
+        if (!counter) {
+            // Si no existe, inicializar en el máximo Id actual
+            const maxJuego = await this.juegoModel.findOne().sort({ Id: -1 }).exec();
+            const startValue = maxJuego ? maxJuego.Id : 0;
+
+            counter = await this.counterModel.create({ name: 'juegos', value: startValue + 1 });
+        }
 
         return counter.value;
     }
+
 
     // ============================================================
     //  CREAR JUEGO
