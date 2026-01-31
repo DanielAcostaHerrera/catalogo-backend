@@ -1,11 +1,12 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { Document } from 'mongoose';
 
-export type SeriesDocument = Series & Document;
-
-@Schema()
-export class Series {
+@Schema({ collection: 'Series' })
+export class Series extends Document {
     @Prop({ required: true, unique: true })
+    Id: number;
+
+    @Prop({ required: true })
     Titulo: string;
 
     @Prop({ required: true })
@@ -22,9 +23,6 @@ export class Series {
 
     @Prop({ required: true })
     Anno: number;
-
-    @Prop({ required: true, unique: true })
-    Id: number;
 }
 
 export const SeriesSchema = SchemaFactory.createForClass(Series);
