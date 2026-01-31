@@ -33,6 +33,9 @@
             "precio": 1000
         }
     },
+    "series": {
+        "precioPorCapitulo": 10
+    },
     "ofertasHDD": [
         {
             "capacidad": "1 TB",

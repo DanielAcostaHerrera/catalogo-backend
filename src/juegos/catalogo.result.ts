@@ -1,5 +1,5 @@
 import { ObjectType, Field, Int } from '@nestjs/graphql';
-import { JuegoType } from './juego.type';
+import { JuegoType } from './types/juego.type';
 
 @ObjectType()
 export class CatalogoResult {

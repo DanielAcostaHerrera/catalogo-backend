@@ -1,6 +1,6 @@
 import { Resolver, Query, Int, Args, ResolveField, Parent, Mutation } from '@nestjs/graphql';
 import { JuegosService } from './juegos.service';
-import { JuegoType } from './juego.type';
+import { JuegoType } from './types/juego.type';
 import { CatalogoResult } from './catalogo.result';
 import { CrearJuegoInput } from './dto/create-juego.input';
 import { ActualizarJuegoInput } from './dto/update-juego.input';

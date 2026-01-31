@@ -3,6 +3,7 @@ import { MongooseModule } from '@nestjs/mongoose';
 import { GraphQLModule } from '@nestjs/graphql';
 import { ApolloDriver } from '@nestjs/apollo';
 import { JuegosModule } from './juegos/juegos.module';
+import { SeriesModule } from './series/series.module'; // 👈 añadimos el módulo de series
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { ServeStaticModule } from '@nestjs/serve-static';
@@ -26,6 +27,7 @@ import { PreciosController } from './precios/precios.controller'; // 👈 import
     }),
 
     JuegosModule,
+    SeriesModule, // 👈 aquí lo añadimos
   ],
   controllers: [AppController, PreciosController],
   providers: [AppService],
