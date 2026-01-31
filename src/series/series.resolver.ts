@@ -3,7 +3,7 @@ import { SeriesService } from './series.service';
 import { SeriesType } from './types/series.type';
 import { CatalogoSeriesResult } from './catalogo-series.result';
 import { CreateSeriesInput } from './dto/create-serie.input';
-import { UpdateSeriesInput } from './dto/update-serie.inpput';
+import { UpdateSeriesInput } from './dto/update-serie.input';
 
 @Resolver(() => SeriesType)
 export class SeriesResolver {

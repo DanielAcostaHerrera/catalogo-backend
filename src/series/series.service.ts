@@ -4,7 +4,7 @@ import { Model } from 'mongoose';
 import { Series } from './series.schema';
 import { Counter } from 'src/juegos/counter.schema';
 import { CreateSeriesInput } from './dto/create-serie.input';
-import { UpdateSeriesInput } from './dto/update-serie.inpput';
+import { UpdateSeriesInput } from './dto/update-serie.input';
 import { CatalogoSeriesResult } from './catalogo-series.result';
 
 
