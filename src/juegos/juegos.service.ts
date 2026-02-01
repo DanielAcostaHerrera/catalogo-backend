@@ -134,12 +134,9 @@ export class JuegosService {
     //  ÚLTIMOS ESTRENOS
     // ============================================================
     async obtenerUltimosEstrenos(limit: number): Promise<CatalogoResultType> {
-        const annoActual = new Date().getFullYear();
-
         const juegos = await this.juegoModel
             .find(
                 {
-                    AnnoAct: annoActual,
                     Nombre: { $not: /\[online\]/i },
                 },
                 { _id: 0 },

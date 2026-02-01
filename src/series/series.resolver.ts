@@ -41,6 +41,17 @@ export class SeriesResolver {
     }
 
     // ============================================================
+    //  ÚLTIMOS ESTRENOS
+    // ============================================================
+
+    @Query(() => CatalogoSeriesResult)
+    async ultimosEstrenosSeries(
+        @Args('limit', { type: () => Int }) limit: number,
+    ): Promise<CatalogoSeriesResult> {
+        return this.service.obtenerUltimosEstrenosSeries(limit);
+    }
+
+    // ============================================================
     //  CREAR SERIE
     // ============================================================
     @Mutation(() => SeriesType)

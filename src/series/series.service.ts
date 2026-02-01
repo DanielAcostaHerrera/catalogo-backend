@@ -6,6 +6,7 @@ import { Counter } from 'src/juegos/counter.schema';
 import { CreateSeriesInput } from './dto/create-serie.input';
 import { UpdateSeriesInput } from './dto/update-serie.input';
 import { CatalogoSeriesResult } from './catalogo-series.result';
+import { CatalogoSeriesResultType } from './types/catalogo-series-result.type';
 
 
 function escapeRegex(value: string): string {
@@ -105,6 +106,25 @@ export class SeriesService {
     // ============================================================
     async obtenerSeriePorId(id: number): Promise<Series | null> {
         return this.seriesModel.findOne({ Id: id }).exec();
+    }
+
+    // ============================================================
+    //  ÚLTIMOS ESTRENOS
+    // ============================================================
+
+    async obtenerUltimosEstrenosSeries(limit: number): Promise<CatalogoSeriesResultType> {
+        const series = await this.seriesModel
+            .find(
+                {},              // 🔹 sin filtro especial, trae todas las series
+                { _id: 0 },      // 🔹 excluye el campo interno de Mongo
+            )
+            .sort({ Id: -1 })    // 🔹 orden descendente por Id (últimas primero)
+            .limit(limit)        // 🔹 limita la cantidad
+            .lean();
+
+        const total = series.length;
+
+        return { series, total };
     }
 
     // ============================================================
