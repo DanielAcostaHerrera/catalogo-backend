@@ -1,0 +1,96 @@
+{
+    "juegos": {
+        "online": 1000,
+        "rangos": [
+            {
+                "minGB": 0,
+                "maxGB": 1,
+                "precio": 100
+            },
+            {
+                "minGB": 1,
+                "maxGB": 10,
+                "precio": 200
+            },
+            {
+                "minGB": 10,
+                "maxGB": 30,
+                "precio": 400
+            },
+            {
+                "minGB": 30,
+                "maxGB": 60,
+                "precio": 600
+            },
+            {
+                "minGB": 60,
+                "maxGB": 80,
+                "precio": 800
+            }
+        ],
+        "default": {
+            "minGB": 80,
+            "precio": 1000
+        }
+    },
+    "series": {
+        "precioPorCapitulo": 10
+    },
+    "ofertasHDD": [
+        {
+            "capacidad": "1 TB",
+            "precioUSD": 15
+        },
+        {
+            "capacidad": "2 TB",
+            "precioUSD": 30
+        },
+        {
+            "capacidad": "3 TB",
+            "precioUSD": 45
+        },
+        {
+            "capacidad": "4 TB",
+            "precioUSD": 60
+        },
+        {
+            "capacidad": "5 TB",
+            "precioUSD": 75
+        },
+        {
+            "capacidad": "6 TB",
+            "precioUSD": 90
+        },
+        {
+            "capacidad": "8 TB",
+            "precioUSD": 120
+        },
+        {
+            "capacidad": "10 TB",
+            "precioUSD": 150
+        },
+        {
+            "capacidad": "12 TB",
+            "precioUSD": 180
+        },
+        {
+            "capacidad": "14 TB",
+            "precioUSD": 210
+        },
+        {
+            "capacidad": "16 TB",
+            "precioUSD": 240
+        },
+        {
+            "capacidad": "18 TB",
+            "precioUSD": 270
+        },
+        {
+            "capacidad": "20 TB",
+            "precioUSD": 300
+        }
+    ],
+    "entregas": {
+        "minimoCUP": 1000
+    }
+}
