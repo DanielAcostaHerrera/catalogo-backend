@@ -1,35 +1,30 @@
 {
     "juegos": {
-        "online": 1000,
+        "online": 1200,
         "rangos": [
             {
                 "minGB": 0,
                 "maxGB": 1,
-                "precio": 100
+                "precio": 200
             },
             {
                 "minGB": 1,
                 "maxGB": 10,
-                "precio": 200
+                "precio": 400
             },
             {
                 "minGB": 10,
                 "maxGB": 30,
-                "precio": 400
+                "precio": 600
             },
             {
                 "minGB": 30,
                 "maxGB": 60,
-                "precio": 600
-            },
-            {
-                "minGB": 60,
-                "maxGB": 80,
                 "precio": 800
             }
         ],
         "default": {
-            "minGB": 80,
+            "minGB": 60,
             "precio": 1000
         }
     },
@@ -91,6 +86,6 @@
         }
     ],
     "entregas": {
-        "minimoCUP": 1000
+        "minimoCUP": 1500
     }
 }
