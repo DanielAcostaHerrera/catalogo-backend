@@ -1,13 +1,14 @@
-import { Resolver, Query, Int, Args, Mutation } from '@nestjs/graphql';
+import { Resolver, Query, Int, Args, Mutation, Context } from '@nestjs/graphql';
 import { AnimesService } from './animes.service';
 import { AnimeType } from './types/animes.type';
 import { CatalogoAnimesResult } from './catalogo-animes.result';
 import { CreateAnimeInput } from './dto/create-anime.input';
 import { UpdateAnimeInput } from './dto/update-anime.input';
+import { AuthContext } from '../usuarios/usuarios.context';
 
 @Resolver(() => AnimeType)
 export class AnimesResolver {
-    constructor(private readonly service: AnimesService) { }
+    constructor(private readonly service: AnimesService) {}
 
     // ============================================================
     //  CATÁLOGO NORMAL (SIN FILTROS)
@@ -51,26 +52,35 @@ export class AnimesResolver {
     }
 
     // ============================================================
-    //  CREAR ANIME
+    //  CREAR ANIME (solo admin)
     // ============================================================
     @Mutation(() => AnimeType)
-    crearAnime(@Args('data') data: CreateAnimeInput) {
+    crearAnime(@Args('data') data: CreateAnimeInput, @Context() context: AuthContext) {
+        if (!context.user || context.user.rol !== 'admin') {
+            throw new Error('No autorizado');
+        }
         return this.service.crearAnime(data);
     }
 
     // ============================================================
-    //  ACTUALIZAR ANIME
+    //  ACTUALIZAR ANIME (solo admin)
     // ============================================================
     @Mutation(() => AnimeType, { nullable: true })
-    actualizarAnime(@Args('data') data: UpdateAnimeInput) {
+    actualizarAnime(@Args('data') data: UpdateAnimeInput, @Context() context: AuthContext) {
+        if (!context.user || context.user.rol !== 'admin') {
+            throw new Error('No autorizado');
+        }
         return this.service.actualizarAnime(data);
     }
 
     // ============================================================
-    //  ELIMINAR ANIME
+    //  ELIMINAR ANIME (solo admin)
     // ============================================================
     @Mutation(() => Boolean)
-    eliminarAnime(@Args('id', { type: () => Int }) id: number) {
+    eliminarAnime(@Args('id', { type: () => Int }) id: number, @Context() context: AuthContext) {
+        if (!context.user || context.user.rol !== 'admin') {
+            throw new Error('No autorizado');
+        }
         return this.service.eliminarAnime(id);
     }
 }

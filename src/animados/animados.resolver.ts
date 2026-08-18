@@ -1,13 +1,14 @@
-import { Resolver, Query, Int, Args, Mutation } from '@nestjs/graphql';
+import { Resolver, Query, Int, Args, Mutation, Context } from '@nestjs/graphql';
 import { AnimadosService } from './animados.service';
 import { AnimadosType } from './types/animados.type';
 import { CatalogoAnimadosResult } from './catalogo-animados.result';
 import { CreateAnimadoInput } from './dto/create-animado.input';
 import { UpdateAnimadoInput } from './dto/update-animado.input';
+import { AuthContext } from '../usuarios/usuarios.context'; // 👈 importa tu interfaz
 
 @Resolver(() => AnimadosType)
 export class AnimadosResolver {
-    constructor(private readonly service: AnimadosService) { }
+    constructor(private readonly service: AnimadosService) {}
 
     // ============================================================
     //  CATÁLOGO NORMAL (SIN FILTROS)
@@ -51,26 +52,36 @@ export class AnimadosResolver {
     }
 
     // ============================================================
-    //  CREAR ANIMADO
+    //  CREAR ANIMADO (solo admin)
     // ============================================================
     @Mutation(() => AnimadosType)
-    crearAnimado(@Args('data') data: CreateAnimadoInput) {
+    crearAnimado(@Args('data') data: CreateAnimadoInput, @Context() context: AuthContext) {
+        if (!context.user || context.user.rol !== 'admin') {
+            throw new Error('No autorizado');
+        }
         return this.service.crearAnimado(data);
     }
 
     // ============================================================
-    //  ACTUALIZAR ANIMADO
+    //  ACTUALIZAR ANIMADO (solo admin)
     // ============================================================
     @Mutation(() => AnimadosType, { nullable: true })
-    actualizarAnimado(@Args('data') data: UpdateAnimadoInput) {
+    actualizarAnimado(@Args('data') data: UpdateAnimadoInput, @Context() context: AuthContext) {
+        if (!context.user || context.user.rol !== 'admin') {
+            throw new Error('No autorizado');
+        }
         return this.service.actualizarAnimado(data);
     }
 
     // ============================================================
-    //  ELIMINAR ANIMADO
+    //  ELIMINAR ANIMADO (solo admin)
     // ============================================================
     @Mutation(() => Boolean)
-    eliminarAnimado(@Args('id', { type: () => Int }) id: number) {
+    eliminarAnimado(@Args('id', { type: () => Int }) id: number, @Context() context: AuthContext) {
+        if (!context.user || context.user.rol !== 'admin') {
+            throw new Error('No autorizado');
+        }
         return this.service.eliminarAnimado(id);
     }
 }
+

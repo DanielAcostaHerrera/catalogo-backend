@@ -1,13 +1,14 @@
-import { Resolver, Query, Int, Args, ResolveField, Parent, Mutation } from '@nestjs/graphql';
+import { Resolver, Query, Int, Args, ResolveField, Parent, Mutation, Context } from '@nestjs/graphql';
 import { JuegosService } from './juegos.service';
 import { JuegoType } from './types/juego.type';
 import { CatalogoResult } from './catalogo.result';
 import { CrearJuegoInput } from './dto/create-juego.input';
 import { ActualizarJuegoInput } from './dto/update-juego.input';
+import { AuthContext } from '../usuarios/usuarios.context'; // 👈 importa tu interfaz
 
 @Resolver(() => JuegoType)
 export class JuegosResolver {
-    constructor(private readonly service: JuegosService) { }
+    constructor(private readonly service: JuegosService) {}
 
     // ============================================================
     //  CATÁLOGO NORMAL (SIN FILTROS)
@@ -57,26 +58,35 @@ export class JuegosResolver {
     }
 
     // ============================================================
-    //  CREAR JUEGO
+    //  CREAR JUEGO (solo admin)
     // ============================================================
     @Mutation(() => JuegoType)
-    crearJuego(@Args('data') data: CrearJuegoInput) {
+    crearJuego(@Args('data') data: CrearJuegoInput, @Context() context: AuthContext) {
+        if (!context.user || context.user.rol !== 'admin') {
+            throw new Error('No autorizado');
+        }
         return this.service.crearJuego(data);
     }
 
     // ============================================================
-    //  ACTUALIZAR JUEGO
+    //  ACTUALIZAR JUEGO (solo admin)
     // ============================================================
     @Mutation(() => JuegoType, { nullable: true })
-    actualizarJuego(@Args('data') data: ActualizarJuegoInput) {
+    actualizarJuego(@Args('data') data: ActualizarJuegoInput, @Context() context: AuthContext) {
+        if (!context.user || context.user.rol !== 'admin') {
+            throw new Error('No autorizado');
+        }
         return this.service.actualizarJuego(data);
     }
 
     // ============================================================
-    //  ELIMINAR JUEGO
+    //  ELIMINAR JUEGO (solo admin)
     // ============================================================
     @Mutation(() => Boolean)
-    eliminarJuego(@Args('id', { type: () => Int }) id: number) {
+    eliminarJuego(@Args('id', { type: () => Int }) id: number, @Context() context: AuthContext) {
+        if (!context.user || context.user.rol !== 'admin') {
+            throw new Error('No autorizado');
+        }
         return this.service.eliminarJuego(id);
     }
 

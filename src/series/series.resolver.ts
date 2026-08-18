@@ -1,13 +1,14 @@
-import { Resolver, Query, Int, Args, Mutation } from '@nestjs/graphql';
+import { Resolver, Query, Int, Args, Mutation, Context } from '@nestjs/graphql';
 import { SeriesService } from './series.service';
 import { SeriesType } from './types/series.type';
 import { CatalogoSeriesResult } from './catalogo-series.result';
 import { CreateSeriesInput } from './dto/create-serie.input';
 import { UpdateSeriesInput } from './dto/update-serie.input';
+import { AuthContext } from '../usuarios/usuarios.context'; // 👈 importa tu interfaz
 
 @Resolver(() => SeriesType)
 export class SeriesResolver {
-    constructor(private readonly service: SeriesService) { }
+    constructor(private readonly service: SeriesService) {}
 
     // ============================================================
     //  CATÁLOGO NORMAL (SIN FILTROS)
@@ -43,7 +44,6 @@ export class SeriesResolver {
     // ============================================================
     //  ÚLTIMOS ESTRENOS
     // ============================================================
-
     @Query(() => CatalogoSeriesResult)
     async ultimosEstrenosSeries(
         @Args('limit', { type: () => Int }) limit: number,
@@ -52,26 +52,35 @@ export class SeriesResolver {
     }
 
     // ============================================================
-    //  CREAR SERIE
+    //  CREAR SERIE (solo admin)
     // ============================================================
     @Mutation(() => SeriesType)
-    crearSerie(@Args('data') data: CreateSeriesInput) {
+    crearSerie(@Args('data') data: CreateSeriesInput, @Context() context: AuthContext) {
+        if (!context.user || context.user.rol !== 'admin') {
+            throw new Error('No autorizado');
+        }
         return this.service.crearSerie(data);
     }
 
     // ============================================================
-    //  ACTUALIZAR SERIE
+    //  ACTUALIZAR SERIE (solo admin)
     // ============================================================
     @Mutation(() => SeriesType, { nullable: true })
-    actualizarSerie(@Args('data') data: UpdateSeriesInput) {
+    actualizarSerie(@Args('data') data: UpdateSeriesInput, @Context() context: AuthContext) {
+        if (!context.user || context.user.rol !== 'admin') {
+            throw new Error('No autorizado');
+        }
         return this.service.actualizarSerie(data);
     }
 
     // ============================================================
-    //  ELIMINAR SERIE
+    //  ELIMINAR SERIE (solo admin)
     // ============================================================
     @Mutation(() => Boolean)
-    eliminarSerie(@Args('id', { type: () => Int }) id: number) {
+    eliminarSerie(@Args('id', { type: () => Int }) id: number, @Context() context: AuthContext) {
+        if (!context.user || context.user.rol !== 'admin') {
+            throw new Error('No autorizado');
+        }
         return this.service.eliminarSerie(id);
     }
 }
