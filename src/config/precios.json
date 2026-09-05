@@ -1,14 +1,9 @@
 {
     "juegos": {
         "online": 1000,
-        "rangos": [
+        "rangos": [           
             {
                 "minGB": 0,
-                "maxGB": 1,
-                "precio": 100
-            },
-            {
-                "minGB": 1,
                 "maxGB": 10,
                 "precio": 200
             },
