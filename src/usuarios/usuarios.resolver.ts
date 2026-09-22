@@ -1,5 +1,8 @@
-import { Resolver, Mutation, Args, Query } from '@nestjs/graphql';
+import { Resolver, Mutation, Args, Query, Int } from '@nestjs/graphql';
 import { UsuariosService } from './usuarios.service';
+import { CreateUsuarioInput } from './dto/create-usuario.input';
+import { UpdateUsuarioInput } from './dto/update-usuario.input';
+import { UsuarioType } from './types/usuario.type';
 import * as bcrypt from 'bcryptjs';
 import * as jwt from 'jsonwebtoken';
 
@@ -34,15 +37,11 @@ export class UsuariosResolver {
     //  CREAR USUARIO
     // ============================================================
     @Mutation(() => String)
-    async crearUsuario(
-        @Args('usuario') usuario: string,
-        @Args('password') password: string,
-        @Args('rol') rol: string,
-    ) {
+    async crearUsuario(@Args('data') data: CreateUsuarioInput) {
         const nuevo = await this.usuariosService.crearUsuario({
-            Usuario: usuario,
-            Password: password,
-            Rol: rol,
+            Usuario: data.Usuario,
+            Password: data.Password,
+            Rol: data.Rol,
         });
 
         return `Usuario ${nuevo.Usuario} creado`;
@@ -52,16 +51,11 @@ export class UsuariosResolver {
     //  ACTUALIZAR USUARIO
     // ============================================================
     @Mutation(() => String)
-    async actualizarUsuario(
-        @Args('id') id: number,
-        @Args('usuario', { nullable: true }) usuario?: string,
-        @Args('password', { nullable: true }) password?: string,
-        @Args('rol', { nullable: true }) rol?: string,
-    ) {
-        const actualizado = await this.usuariosService.actualizarUsuario(id, {
-            Usuario: usuario,
-            Password: password,
-            Rol: rol,
+    async actualizarUsuario(@Args('data') data: UpdateUsuarioInput) {
+        const actualizado = await this.usuariosService.actualizarUsuario(data.Id, {
+            Usuario: data.Usuario,
+            Password: data.Password,
+            Rol: data.Rol,
         });
 
         if (!actualizado) throw new Error('Usuario no encontrado');
@@ -72,12 +66,11 @@ export class UsuariosResolver {
     // ============================================================
     //  OBTENER USUARIO POR ID
     // ============================================================
-    @Query(() => String)
-    async obtenerUsuarioPorId(@Args('id') id: number) {
+    @Query(() => UsuarioType, { nullable: true })
+    async obtenerUsuarioPorId(@Args('id', { type: () => Int }) id: number) {
         const user = await this.usuariosService.obtenerUsuarioPorId(id);
         if (!user) throw new Error('Usuario no encontrado');
 
-        return `Usuario: ${user.Usuario}, Rol: ${user.Rol}`;
+        return user;
     }
 }
-
