@@ -1,31 +1,36 @@
 {
     "juegos": {
-        "online": 1000,
-        "rangos": [           
+        "online": 1200,
+        "rangos": [    
             {
                 "minGB": 0,
-                "maxGB": 10,
+                "maxGB": 1,
                 "precio": 200
+            },       
+            {
+                "minGB": 1,
+                "maxGB": 10,
+                "precio": 300
             },
             {
                 "minGB": 10,
                 "maxGB": 30,
-                "precio": 400
+                "precio": 500
             },
             {
                 "minGB": 30,
                 "maxGB": 60,
-                "precio": 600
+                "precio": 800
             },
             {
                 "minGB": 60,
                 "maxGB": 100,
-                "precio": 800
+                "precio": 1000
             }
         ],
         "default": {
             "minGB": 100,
-            "precio": 1000
+            "precio": 1200
         }
     },
     "series": {
