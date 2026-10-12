@@ -10,12 +10,12 @@
             {
                 "minGB": 1,
                 "maxGB": 10,
-                "precio": 300
+                "precio": 400
             },
             {
                 "minGB": 10,
                 "maxGB": 30,
-                "precio": 500
+                "precio": 600
             },
             {
                 "minGB": 30,
